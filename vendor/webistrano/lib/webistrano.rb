@@ -1,8 +1,11 @@
-require 'net/http'
-require 'net/https'
+require 'uri'
+require 'httparty'
 require 'builder'
 
 class Webistrano
+  include HTTParty
+  format :xml
+  headers({"content-type" => "application/xml"})
   
   def initialize(options = {})
     @options = {
@@ -15,22 +18,14 @@ class Webistrano
     
     validate
     
-    @url = URI.parse(url)
-    @path = construct_path
-    @req = Net::HTTP::Post.new(@path)
-    @req.basic_auth @options[:user], @options[:password]
+    self.class.basic_auth @options[:user], @options[:password]
+    self.class.base_uri @options[:url].dup
   end
   
   def deploy(task, comment)
-    comment = "Github commit hook. " + comment
-    @req.set_form_data({
-      'deployment'=> build_deployment_xml(task, comment)
-    })
-    @res = Net::HTTP.new(@url.host, @url.port).start {|http| http.request(@req) }
+    comment = "Github commit hook: " + comment
+    self.class.post(construct_path, :body => build_deployment_xml(task, comment))
   end
-  
-
-protected
   
   def build_deployment_xml(task, comment)
     xml = Builder::XmlMarkup.new(:indent => 2)
@@ -42,9 +37,12 @@ protected
     xml.target!.to_s
   end
   
+
+protected
+  
   def construct_path
-    path = @url.path.chomp('/')
-    path += "/projects/#{@options[:project_id]}/stages/#{@options[:stage_id]}/deployments/create"
+    path = @options[:url].dup.chomp('/')
+    path += "/projects/#{@options[:project_id]}/stages/#{@options[:stage_id]}/deployments.xml"
     path
   end
   
