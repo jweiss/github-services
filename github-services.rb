@@ -22,6 +22,7 @@ require 'tmail'
 require 'xmpp4r'
 require 'xmpp4r-simple'
 require 'rubyforge'
+require 'webistrano'
 
 module GitHub
   def service(name)

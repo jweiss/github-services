@@ -1,0 +1,29 @@
+Webistrano
+========
+
+This service calls a Webistrano task after each commit. You can use it to deploy you test-box or run the migrations after each commit.
+
+Install Notes
+-------------
+
+  1. url - The base url of your Webistrano installation, e.g. https://internal.example.com/webistrano
+  2. project_id - The id of the project that should be deployed, e.g. 5 out of https://internal.example.com/webistrano/projects/5
+  3. stage_id - The id of the stage that should be deployed, e.g. 11 out of https://internal.example.com/webistrano/projects/5/stages/11
+  4. user - The login of the user that should be used for the deployment
+  5. password - The password of the above user
+  6. task - the task to execute. Normally you would want deploy:migrations
+
+
+Developer Notes
+---------------
+
+data
+  - url
+  - project_id
+  - stage_id
+  - user
+  - password
+  - task
+
+payload
+  - refer to docs/github_payload
